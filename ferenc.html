@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Ferenc</title>
+		<style type="text/css">
+			body,canvas {
+				margin: 0px;
+				padding: 0px;
+			}
+			.table-cell {
+				display: table-cell;
+				width: 130px !important;
+			}
+		</style>
+	</head>
+	<body>
+		<div style="float: left;">
+			<canvas id="glcanvas"></canvas>
+		</div>
+		<div>
+			<div>
+				<input id="resetView" type="button" value="reset view">
+			</div>
+			<div>
+				<label for="normalizeEnabled">normalize</label>
+				<input id="normalizeEnabled" type="checkbox">
+				<input id="normalizeX" type="number">
+				<input id="normalizeY" type="number">
+				<input id="normalizeZ" type="number">
+			</div>
+			<div>
+				<label for="planeXZ">plane X-Z</label>
+				<input id="planeXZ" type="checkbox">
+			</div>
+			<div>
+				<label for="transparent">transparent</label>
+				<input id="transparent" type="checkbox">
+			</div>
+
+			<div>
+				<div>
+					<textarea id="radiatorsText" cols="40" rows="20"></textarea>
+				</div>
+				<div>
+					<input id="radiatorsButton" type="button" value="recompile">
+				</div>
+			</div>
+
+			<div>
+				<input id="linearArrayButton" type="button" value="add linear" onclick="showLinear()">
+				<div id="linearArrayGui" style="display: none">
+					<div style="display: table-row">
+						<div class="table-cell"><label for="linearType">Type</label></div>
+						<div class="table-cell">
+							<select id="linearType">
+								<option value="dipole">Dipole</option>
+								<option value="isotropic">Isotropic</option>
+								<option value="spot">Spot</option>
+							</select>
+						</div>
+					</div>
+					<div style="display: table-row">
+						<div class="table-cell"><label for="linearQuanity">Quanity</label></div>
+						<div class="table-cell"><input id="linearQuanity" type="number" min="2" value="16"></div>
+					</div>
+					<div style="display: table-row">
+						<div class="table-cell"><label for="linearDistance">Distance</label></div>
+						<div class="table-cell"><input id="linearDistance" type="number" min="0.0001" value ="0.0625"></div>
+					</div>
+					<div style="display: table-row">
+						<div class="table-cell"><label for="linearAngle">Angle</label></div>
+						<div class="table-cell"><input id="linearAngle" value ="Math.PI/2.0"></div>
+					</div>
+					<div style="display: table-row">
+						<div class="table-cell"><label id="linearShiftLabel" for="linearShift">Shift</label></div>
+						<div class="table-cell">
+							<div class="table-cell">
+								<input id="linearShiftText" value ="0" onchange="showShiftSliderValue(this.value)">
+								<input id="linearShift" type="range" min="-180" max="180" value ="0" step="0.01" onchange="showShiftValue(this.value)">
+							</div>
+						</div>
+					</div>
+					<div style="display: table-row">
+						<div class="table-cell"><label for="linearFrequency">Frequency</label></div>
+						<div class="table-cell"><input id="linearFrequency" type="number" min="0.1" value ="1"></div>
+					</div>
+					<div style="display: table-row">
+						<div class="table-cell"><label for="linearWaveLength">Wave length</label></div>
+						<div class="table-cell"><input id="linearWaveLength" type="number" min="0.1" value ="0.25"></div>
+					</div>
+					<input id="linearSubmit" type="button" value="update" onclick="updateRadiatorsTextAndCompile()">
+				</div>
+			</div>
+		</div>
+            <div>
+                <input id="matrixArrayButton" type="button" value="add matrix" onclick="showMatrix()">
+				<div id="matrixArrayGui" style="display: none">
+					<div style="display: table-row">
+						<div class="table-cell"><label for="matrixType">Type</label></div>
+						<div class="table-cell">
+							<select id="matrixType">
+							<option value="dipole">Dipole</option>
+							<option value="dipole90">Dipole 90</option>
+							<option value="isotropic">Isotropic</option>
+							<option value="spot">Spot</option>
+							</select>
+						</div>
+					</div>
+					<div style="display: table-row">
+						<div class="table-cell"><label for="matrixRow">Row</label></div>
+						<div class="table-cell"><input id="matrixRow" type="number" min="2" value="8"></div>
+					</div>
+					<div style="display: table-row">
+						<div class="table-cell"><label for="matrixColumn">Column</label></div>
+						<div class="table-cell"><input id="matrixColumn" type="number" min="2" value="8"></div>
+					</div>
+					<div style="display: table-row">
+						<div class="table-cell"><label for="matrixDistanceX">Column Distance</label></div>
+							<div class="table-cell"><input id="matrixDistanceX" type="number" min="0.0001" value ="0.0625"></div>
+					</div>
+					<div style="display: table-row">
+						<div class="table-cell"><label for="matrixDistanceY">Row Distance</label></div>
+						<div class="table-cell"><input id="matrixDistanceY" type="number" min="0.0001" value ="0.0625"></div>
+					</div>
+					<div style="display: table-row">
+						<div class="table-cell"><label for="matrixAngle">Angle</label></div>
+						<div class="table-cell"><input id="matrixAngle" value ="Math.PI/2.0"></div>
+					</div>
+					<div style="display: table-row">
+						<div class="table-cell"><label id="matrixShiftLabel" for="matrixShiftX">Shift</label></div>
+							<div class="table-cell">
+								<div class="table-cell">
+									<input id="matrixShiftXText" value ="0" onchange="showShiftSliderXValue(this.value)">
+									<input id="matrixShiftX" type="range" min="-180" max="180" value ="0" step="0.01" onchange="showShiftXValue(this.value)">
+									<input id="matrixShiftYText" value ="0" onchange="showShiftSliderYValue(this.value)">
+									<input id="matrixShiftY" type="range" min="-180" max="180" value ="0" step="0.01" onchange="showShiftYValue(this.value)">
+								</div>
+							</div>
+					</div>
+					<div style="display: table-row">
+						<div class="table-cell"><label for="matrixFrequency">Frequency</label></div>
+							<div class="table-cell"><input id="matrixFrequency" type="number" min="0.1" value ="1"></div>
+					</div>
+					<div style="display: table-row">
+						<div class="table-cell"><label for="matrixWaveLength">Wave length</label></div>
+							<div class="table-cell"><input id="matrixWaveLength" type="number" min="0.1" value ="0.25"></div>
+					</div>
+					<input id="matrixSubmit" type="button" value="update" onclick="updateRadiatorsTextAndCompileMatrix()">
+				</div>
+            </div>
+		</div>
+
+		<script type="text/javascript" src="gui.js"></script>
+		<script type="text/javascript" src="gl-matrix.js"></script>
+		<script type="text/javascript" src="supreme.js"></script>
+		<script type="text/javascript" src="shaders.js"></script>
+		<script type="text/javascript" src="init.js"></script>
+		<script type="text/javascript" src="move.js"></script>
+		<script type="text/javascript" src="draw.js"></script>
+	</body>
+</html>
